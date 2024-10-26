@@ -1,0 +1,49 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlserver"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String
+  recipes   Recipe[] 
+}
+
+model Recipe {
+  id        Int      @id @default(autoincrement())
+  name      String   @db.VarChar(255)
+  description String
+  instructions String
+  ingredients Ingredient[]
+  category   Category @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  cuisine    String
+  imageUrl   String
+  prepTime   Int
+  cookTime   Int
+  servings   Int
+  rating     Float?
+  reviews    Review[]
+}
+
+model Ingredient {
+  id        Int      @id @default(autoincrement())
+  name      String
+  quantity  String
+  unit      String
+  recipe    Recipe   @relation(fields: [recipeId], references: [id])
+  recipeId  Int
+}
+
+model Review {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  rating    Int
+  comment   String
+  recipe    Recipe   @relation(fields: [recipeId], references: [id])
+  recipeId  Int
+}
