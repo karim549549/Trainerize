@@ -3,11 +3,9 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { PrismaClient } from '@prisma/client';
-import { CategoryModule } from './category/category.module';
-import { RecipeModule } from './recipe/recipe.module';
 
 @Module({
-  imports: [ PrismaClient, CategoryModule, RecipeModule],
+  imports: [ PrismaClient],
   controllers: [AppController],
   providers: [AppService],
 })

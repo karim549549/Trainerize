@@ -7,43 +7,107 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Category {
-  id        Int      @id @default(autoincrement())
-  name      String
-  recipes   Recipe[] 
+model User {
+  id            String    @id @default(uuid())
+  name          String
+  email         String    @unique
+  passwordHash  String
+  gender        String
+  age           Int?
+  height        Float?
+  weight        Float?
+  calorieTarget Float
+  allergies     String?   @default("[]")
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  deletedAt     DateTime?
+
+  subscriptions UserSubscription[]
+  dietPlans     DietPlan[]
+  userAllergies UserAllergy[]
+
+  @@index([calorieTarget])
 }
 
 model Recipe {
-  id        Int      @id @default(autoincrement())
-  name      String   @db.VarChar(255)
+  id          Int       @id @default(autoincrement())
+  name        String
   description String
-  instructions String
-  ingredients Ingredient[]
-  category   Category @relation(fields: [categoryId], references: [id])
-  categoryId Int
-  cuisine    String
-  imageUrl   String
-  prepTime   Int
-  cookTime   Int
-  servings   Int
-  rating     Float?
-  reviews    Review[]
+  ingredients String
+  calories    Float
+  dietType    String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  deletedAt   DateTime?
+
+  dietPlanMeals DietPlanMeal[]
+  allergyFlags  RecipeAllergyFlag[]
 }
 
-model Ingredient {
-  id        Int      @id @default(autoincrement())
-  name      String
-  quantity  String
-  unit      String
-  recipe    Recipe   @relation(fields: [recipeId], references: [id])
-  recipeId  Int
+model DietPlan {
+  id            Int      @id @default(autoincrement())
+  userId        String
+  startDate     DateTime
+  endDate       DateTime
+  calorieTarget Float
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  user  User           @relation(fields: [userId], references: [id])
+  meals DietPlanMeal[]
 }
 
-model Review {
+model DietPlanMeal {
+  id          Int      @id @default(autoincrement())
+  dietPlanId  Int
+  recipeId    Int
+  mealTime    String
+  day         Int
+  scheduledAt DateTime
+  createdAt   DateTime @default(now())
+
+  dietPlan DietPlan @relation(fields: [dietPlanId], references: [id])
+  recipe   Recipe   @relation(fields: [recipeId], references: [id])
+}
+
+model UserAllergy {
   id        Int      @id @default(autoincrement())
   userId    String
-  rating    Int
-  comment   String
-  recipe    Recipe   @relation(fields: [recipeId], references: [id])
+  allergy   String
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+model RecipeAllergyFlag {
+  id        Int      @id @default(autoincrement())
   recipeId  Int
+  allergy   String
+  createdAt DateTime @default(now())
+
+  recipe Recipe @relation(fields: [recipeId], references: [id])
+}
+
+model SubscriptionTier {
+  id             Int                @id @default(autoincrement())
+  name           String
+  price          Float
+  durationInDays Int
+  features       String
+  createdAt      DateTime           @default(now())
+  subscriptions  UserSubscription[]
+}
+
+model UserSubscription {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  tierId    Int
+  startDate DateTime
+  endDate   DateTime
+  isActive  Boolean
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User             @relation(fields: [userId], references: [id])
+  tier SubscriptionTier @relation(fields: [tierId], references: [id])
 }
