@@ -70,8 +70,13 @@ export class AuthService {
         );
     }
 
-    async getAllUsers(): Promise<User[]> {
-        return await this.repository.user.findMany();
+    async getAllUsers(pageNumber: number = 1, pageSize: number = 10): Promise<User[]> {
+        return await this.repository.user.findMany(
+            {
+                skip: (pageNumber - 1) * pageSize,
+                take: pageSize,
+            }
+        );
     }
 
     async forgetPassword(email: string): Promise<{ message: string }> {

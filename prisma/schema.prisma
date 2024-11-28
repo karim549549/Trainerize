@@ -45,12 +45,13 @@ model Recipe {
   name          String
   description   String
   ingredients   String
+  instructions  String
   calories      Float
   dietType      String
+  image         String
   createdAt     DateTime       @default(now())
   updatedAt     DateTime       @updatedAt
-  deletedAt     DateTime?
-  Allergies     String         @default("[]")
+  allergies     String         @default("[]")
   dietPlanMeals DietPlanMeal[]
 }
 
@@ -78,13 +79,12 @@ model DietPlanMeal {
 }
 
 model SubscriptionTier {
-  id             Int                @id @default(autoincrement())
-  name           String
-  price          Float
-  durationInDays Int
-  features       String
-  createdAt      DateTime           @default(now())
-  subscriptions  UserSubscription[]
+  id            Int                @id @default(autoincrement())
+  name          String             @unique
+  pricePerMonth Float
+  features      String
+  createdAt     DateTime           @default(now())
+  subscriptions UserSubscription[]
 }
 
 model UserSubscription {

@@ -1,6 +1,5 @@
 export class CreateSubscriptionTierDto {
   name: string;
-  price: number;
-  durationInDays: number;
+  pricePerMonth:number;
   features: string;
 }
