@@ -46,10 +46,9 @@ export class AuthService {
 
   async login(loginDto: LoginDto, res: Response, tokenId: string): Promise<Result<AuthResponse>> {
     const user = await this.userRepository.findUserByEmail(loginDto.email);
-    if (!user /*  !(await bcrypt.compare(loginDto.password, user.passwordHash)) || */  ) {
+    if (!user || (!(await bcrypt.compare(loginDto.password, user.passwordHash)) && !user.googleId)) {
       return new Result<AuthResponse>(false, null, 401, 'Invalid email or password.');
     }
-
     const accessToken = await this.jwtService.sign({
       email: user.email,
       role: user.role,

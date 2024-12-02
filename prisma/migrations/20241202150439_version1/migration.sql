@@ -12,7 +12,7 @@ CREATE TABLE [dbo].[User] (
     [subscriptionId] INT,
     [photoUrl] NVARCHAR(1000),
     [googleAccessToken] NVARCHAR(1000),
-    [TokenRefreshToken] NVARCHAR(1000),
+    [googleRefreshToken] NVARCHAR(1000),
     [role] NVARCHAR(1000) NOT NULL CONSTRAINT [User_role_df] DEFAULT 'USER',
     [createdAt] DATETIME2 NOT NULL CONSTRAINT [User_createdAt_df] DEFAULT CURRENT_TIMESTAMP,
     [updatedAt] DATETIME2 NOT NULL,
