@@ -1,11 +1,14 @@
 import { Controller, Post, Body, Get, Res, Req, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { SignUpDto } from './dto/signup.dto';
+import { SignUpDto } from '../user/dtos/createUser.dto';
 import { Response, Request } from 'express';
 import { ForgetPasswordDto } from './dto/forgetPassword.dto';
+import { UseGuards } from '@nestjs/common';
+import { GoogleAuthGuard } from './guards/googleAuth.guard';
+import { AuthGuard } from '@nestjs/passport';
 
-@Controller('account')
+@Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
@@ -66,13 +69,31 @@ export class AuthController {
       message: result.message,
     };
   }
-
   @Get('logout')
   async logout(@Req() req: Request , @Res() res: Response): Promise<any> {
-    req.cookies['refreshToken'] = '';
+    res.cookie('refreshToken', '', { maxAge: 0 });
     return res.status(HttpStatus.OK).json({
       status: 'success',
       message: 'Logout successful',
     });
+  }
+
+  @Get('google')
+  @UseGuards(AuthGuard('google')) 
+  async googleLogin() {
+  }
+
+  @Get('google/callback')
+  @UseGuards(GoogleAuthGuard)
+  async googleCallback(@Req() req, @Res() res: Response) {
+    const result = await this.authService.signUpWithGoogle(req.user, res);
+    if (!result.isSuccess) {
+      return res.status(HttpStatus.INTERNAL_SERVER_ERROR).json({
+        status: 'failed',
+        message: result.message,
+      });
+    }
+    const homeUrl = `http://localhost:3000/home?token=${result.data.accessToken}`;
+    return res.redirect(homeUrl);
   }
 }
