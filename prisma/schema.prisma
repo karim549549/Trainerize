@@ -7,24 +7,55 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Admin model is to be implemented -m premissions json, assignedTasks list[]
+
 model User {
   id                 String    @id @default(uuid())
   email              String    @unique
   googleId           String?
   passwordHash       String?
-  username           String
-  subscriptionId     Int?
+  username           String    @unique
+  profile            CustomerProfile?
+  //phoneNumber        String?   @unique phone number better here than customer
+  //subscriptionId     Int?    a user is to be assigned a role no subs required here 
   photoUrl           String?
   googleAccessToken  String?
   googleRefreshToken String?
-  role               String    @default("USER")
+  role               String    @default("USER")              //Role    @default(USER) to be modified
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
-  deletedAt          DateTime?
+  deletedAt          DateTime?                               // why i have delete at stored?
 
-  verificationTokens Token[]
+  verificationTokens Token[]  // prisma doesn't accept list
 
   @@index([email])
+}
+
+model CustomerProfile {
+  id                  String  @id @default(uuid())
+  customerId              String  @unique
+  weight              Float?                         // in kilograms *pds func frnd*
+  height              Float?                         // in meters  *ft func frnd*
+  goalWeight          Float?
+  age                 Int?
+  gender              String  @default("MALE")      // enum
+  activityLevel       String  @default("SEDENTARY") // enum
+  caloriclntakeGoal   Int?
+  dietPreference      String  @default("BALANCED")  //enum
+  allergies           String?         //list[]  connector doesn't support list
+  fitnessGoal         String  @default("LOSE_WEIGHT")  //enum
+  waterIntakeGoal     Float?
+  slepGoal            Float?                          // in hours
+  stepGoal            Int?
+  preferredExercise   String?          //list[]
+  //weeklyProgress      Json?           // track weekly changes weight, calIntk, other
+  notificationsEnable Boolean @default(false)
+
+  user User @relation(fields: [customerId], references: [id])
+
+  createdAt            DateTime  @default(now())
+  updatedAt            DateTime  @default(now())
+
 }
 
 model UserSubscription {
@@ -53,3 +84,37 @@ model Token {
   createdAt DateTime @default(now())
   expireAt  DateTime
 }
+
+
+//database connector doesn't support enums
+
+// enum Role {
+//   admin
+//   user
+// }
+
+// enum Gender {
+//   male
+//   female
+// }
+
+// enum ActivityLevel {
+//   sedentary
+//   lightly_active
+//   moderately_active
+//   very_active
+// }
+
+// enum DietPreference {
+//   vegetarian
+//   vegan
+//   keto
+//   paleo
+//   balanced
+// }
+
+// enum FitnessGoals {
+//   lose_weight
+//   gain_muscle
+//   maintain_weight
+// }
