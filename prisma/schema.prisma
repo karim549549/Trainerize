@@ -45,11 +45,50 @@ model SubscriptionTier {
 }
 
 model Token {
-  id     String @id @default(uuid())
-  userId String
-  type   String
-  user   User   @relation(fields: [userId], references: [id])
-
+  id        String   @id @default(uuid())
+  userId    String
+  type      String
+  user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
   expireAt  DateTime
+}
+
+model Recipe {
+  id          Int     @id @default(autoincrement())
+  name        String
+  description String?
+  instruction String?
+  ingrediants String
+
+  servingPerGram    Int
+  calories          Int
+  totalFat          Int
+  saturatedFat      Int
+  totalCarbohydrate Int
+  sugar             Int
+  fiber             Int
+  Protein           Int
+
+  isNutsFree      Boolean @default(false)
+  isGlutenFree    Boolean @default(false)
+  isDairyFree     Boolean @default(false)
+  isEggFree       Boolean @default(false)
+  isSoyFree       Boolean @default(false)
+  isShellfishFree Boolean @default(false)
+  isWheatFree     Boolean @default(false)
+  isPeanutFree    Boolean @default(false)
+
+  imageUrl               String?
+  peraperationTimePerMin Int
+  categoryId             Int
+
+  category Category @relation(fields: [categoryId], references: [id])
+}
+
+model Category {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+
+  recipes Recipe[]
 }

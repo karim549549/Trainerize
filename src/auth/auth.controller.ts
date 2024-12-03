@@ -7,11 +7,9 @@ import { ForgetPasswordDto } from './dto/forgetPassword.dto';
 import { UseGuards } from '@nestjs/common';
 import { GoogleAuthGuard } from './guards/googleAuth.guard';
 import { AuthGuard } from '@nestjs/passport';
-
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
-
   @Post('signup')
   async signUp(@Body() signUpDto: SignUpDto, @Res() res: Response): Promise<any> {
     const result = await this.authService.signUp(signUpDto , res);
@@ -23,7 +21,6 @@ export class AuthController {
       message: result.message,
     });
   }
-
   @Post('login')
   async login(@Body() loginDto: LoginDto, @Res() res: Response , @Req () req: Request): Promise<any> {
     const result = await this.authService.login(loginDto ,res ,req.cookies['refreshToken']);
@@ -36,7 +33,6 @@ export class AuthController {
       message: result.message,
     });
   }
-
   @Get('refresh-token')
   async refreshToken(@Req() req: Request, @Res() res: Response): Promise<any> {
     const refreshToken = req.cookies['refreshToken'];
@@ -56,7 +52,6 @@ export class AuthController {
       message: result.message,
     });
   }
-  
   @Post('forget-password')
   async forgetPasssword(@Body() email: ForgetPasswordDto): Promise<any> {
     const result = await this.authService.forgetPasssword(email.email);
@@ -77,7 +72,6 @@ export class AuthController {
       message: 'Logout successful',
     });
   }
-
   @Get('google')
   @UseGuards(AuthGuard('google')) 
   async googleLogin() {
