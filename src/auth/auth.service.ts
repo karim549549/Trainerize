@@ -54,8 +54,7 @@ export class AuthService {
       role: user.role,
       sub: user.id,
     });
-
-    await this.tokenService.deleteTokenById(tokenId);
+    if  (tokenId) await this.tokenService.deleteTokenById(tokenId);
     const refreshToken = await this.tokenService.createToken(user.id, 'refresh');
     await this.tokenService.storeTokenInCookie(res, refreshToken);
     const data = new AuthResponse(accessToken, refreshToken.expireAt);
@@ -90,7 +89,6 @@ export class AuthService {
     const token = await this.tokenService.createToken(user.id, 'reset');
     const yesLink = `${process.env.FORGET_PASSWORD_YES}${token.id}`;
     const noLink = `${process.env.FORGET_PASSWORD_NO}${token.id}`;
-
     const subject = 'Password Reset';
     const html = await this.emailFactory.createForgetEmail(
       `${token.expireAt}`,

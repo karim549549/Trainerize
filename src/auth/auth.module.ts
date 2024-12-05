@@ -10,16 +10,24 @@ import { PrismaService } from 'prisma/prisma.service';
 import { EmailSender } from 'src/emailsender/emailsender.service';
 import { EmailFactory } from 'src/emailsender/factories/email.factory';
 import { GoogleAuthGuard } from './guards/googleAuth.guard';
-import { PassportModule } from '@nestjs/passport';
+
 import { GoogleStrategy } from './strategies/google.strategy';
+import { JwtStrategy } from './strategies/jwt.strategy';
+import { RolesGuard } from './guards/role.guard';
+
 
 @Module({
-  imports: [UserModule,PassportModule , TokenModule , JwtModule.register({
+  imports: [
+    UserModule , 
+    TokenModule ,
+    JwtModule.register({
     secret: process.env.JWT_SECRET,
     signOptions: { expiresIn: `${process.env.EXPIRE_AT_JWT}` },
-  })],
+  })
+],
   controllers: [AuthController],
   providers: [AuthService , UserRepository ,GoogleStrategy ,GoogleAuthGuard ,
-    TokenService , PrismaService ,EmailSender ,EmailFactory],
+    TokenService , PrismaService ,EmailSender ,EmailFactory ,JwtStrategy ,RolesGuard],
+  exports: [JwtModule ,RolesGuard ],
 })
 export class AuthModule {}
